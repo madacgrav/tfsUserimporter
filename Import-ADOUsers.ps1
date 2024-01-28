@@ -5,6 +5,68 @@ param (
     [string]$ADOpat
 )
 
+function Get-ADOGroupInfo ([string]$PAT, [string]$orgName) {
+    $username = ""
+    $Auth = '{0}:{1}' -f $username, $PAT
+    $Auth = [System.Text.Encoding]::UTF8.GetBytes($Auth)
+    $Auth = [System.Convert]::ToBase64String($Auth)
+    $header = @{Authorization = ("Basic {0}" -f $Auth) }
+
+    $groupApiUrl = "https://vssps.dev.azure.com/$orgName/_apis/graph/groups?api-version=7.1-preview.1"
+    $groups = (Invoke-RestMethod -Uri $groupApiUrl -Headers $header -Method GET  -ContentType application/json).value
+
+    $adoGroups = @()
+
+    foreach ($group in $groups) {
+        if ($group.origin -eq "vsts") {
+            $groupInfo = [psobject]@{
+                Name = $group.principalName
+                id = $group.descriptor
+            }
+            $adoGroups += $groupInfo
+        }
+    }
+    return $adoGroups
+}
+
+
+function Get-ADOUserInfo ([string]$PAT, [string]$orgName) {
+    $username = ""
+    $Auth = '{0}:{1}' -f $username, $PAT
+    $Auth = [System.Text.Encoding]::UTF8.GetBytes($Auth)
+    $Auth = [System.Convert]::ToBase64String($Auth)
+    $header = @{Authorization = ("Basic {0}" -f $Auth) }
+    $userApiurl = "https://vssps.dev.azure.com/$orgName/_apis/graph/users?api-version=7.1-preview.1"
+
+    $users = (Invoke-RestMethod -Uri $userApiurl -Headers $header -Method GET  -ContentType application/json).value
+    $adoUsers = @()
+
+    foreach ($user in $users) {
+        $userInfo = [psobject]@{
+            Name = $user.principalName
+            id = $user.descriptor
+        }
+        $adoUsers += $userInfo
+    }
+    return $adoUsers
+}
+
+function Add-ADOUsertoGroup ([string]$userid, [string]$groupID,[string]$PAT, [string]$orgName) {
+    $username = ""
+    $Auth = '{0}:{1}' -f $username, $PAT
+    $Auth = [System.Text.Encoding]::UTF8.GetBytes($Auth)
+    $Auth = [System.Convert]::ToBase64String($Auth)
+    $header = @{Authorization = ("Basic {0}" -f $Auth) }
+    $updateMemberAPI = "https://vssps.dev.azure.com/$orgName/_apis/graph/memberships/" + $uuserid + "/" + $groupID + "?api-version=7.1-preview.1"
+    try {
+        $resposne = Invoke-RestMethod -Uri $updateMemberAPI -Headers $header -Method PUT  -ContentType application/json
+        return "success"
+    }
+    catch {
+        return "failed"
+    }
+    
+}
 
 $identityMap = Import-Csv -Path ".\identityMap.csv" | ConvertFrom-Csv -Delimiter ';'
 $ADSGroupInfo = Get-Content -Path ".\Export_ADSGroupMemberships.json" | ConvertFrom-Json
