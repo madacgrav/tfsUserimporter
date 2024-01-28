@@ -9,6 +9,18 @@ param (
     [string]$ADSCollecionUrl
 )
 
+function Get-TFSGroupMembers ([string]$grouName, [string]$domain, [string]$collecionUrl, [string]$tfsecurityPath) {
+    $rawMembers = Invoke-Expression "& $tfsecurityPath /imx '$grouName' /collection:$collecionUrl"
+    $members = @()
+    foreach ($line in $rawMembers) {
+       $matchstring = $domain + '\\s*([^\n\r\s]*\S)'
+        if ($line -match $matchstring) {
+            $members += $matches[1]
+        }
+    }
+    return $members
+}
+ 
 
 function Get-TFSFullGroupsInfo ([string]$TFSversion, [string]$TFSCollectionUrl, [string]$olddomainname, [string]$PAT) {
 
