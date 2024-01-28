@@ -17,13 +17,14 @@ Requirements:
 6. Powershell installed on server
 
 Parameters:
-domainName : first part of information found in the requirements ie **Domain**\username
-ADSPAT : Authentication token created in the ADS server with admin privileges
-ADSVersion : The major version of ADS. Allowed values 2019, 2020, 2022
-ADSCollectionUrl : The root url for the ADS project collection
-ADOorgName : The name of the organization for the ADO instance - ie https://dev.azure.com/**Orgname**
-ADOpat : Authentication token created in the ADO instaance with admin privileges
+* domainName : first part of information found in the requirements ie **Domain**\username
+* ADSPAT : Authentication token created in the ADS server with admin privileges
+* ADSVersion : The major version of ADS. Allowed values 2019, 2020, 2022
+* ADSCollectionUrl : The root url for the ADS project collection
+* ADOorgName : The name of the organization for the ADO instance - ie https://dev.azure.com/**Orgname**
+* ADOpat : Authentication token created in the ADO instaance with admin privileges
 
 Steps:
-Run script with the following parameters
+* Run script with the following parameters:
+  
 .\Import-UsersADStoADO.ps1 -domainName <domain> -ADSPAT <token for ADS> -ADSVersion 2019 -ADSCollectionUrl "https://ads.domainname.com/tfs/DefaultCollection" -ADOorgName "Orgname" -ADOpat <token for ADO>
