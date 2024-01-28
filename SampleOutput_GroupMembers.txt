@@ -1,0 +1,31 @@
+Resolving identity "Team Foundation Administrators"...
+
+    SID: S-1-9-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX-XXXXXXXXXX-0-0-0-0-1
+
+    DN:
+
+    Identity type: Team Foundation Server application group
+    Group type: AdministrativeApplicationGroup
+    Project scope: Server scope
+    Display name: Team Foundation Administrators
+    Description: Members of this application group can perform all privileged operations on the server.
+
+    10 member(s):
+      [U] Datum1\hholt (Holly Holt)
+      [U] Datum1\jpeoples (John Peoples)
+      [U] Datum1\tommyh (Tommy Hartono)
+      [U] Datum1\henriea (Henriette Andersen)
+      [U] Datum1\djayne (Darcy Jayne)
+      [U] Datum1\aprilr (April Reagan)
+      [G] Datum1\InfoSec Secure Environment
+      [U] Datum1\nbento (Nuno Bento)
+      [U] Datum1\cristp (Cristian Petculescu)
+      [G] BUILTIN\Administrators (BUILTIN\Administrators)
+    s [A] [InstanceName]\Team Foundation Service Accounts
+
+    Member of 3 group(s):
+    a [A] [DatumOne]\Project Collection Administrators ([DatumOne]\Project Collection Administrators)
+    e [A] [DatumOne]\Project Collection Valid Users ([DatumOne]\Project Collection Valid Users)
+    e [A] [InstanceName]\Team Foundation Valid Users
+
+    Done.
