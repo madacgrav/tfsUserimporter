@@ -77,7 +77,8 @@ $ADOUserInfo = Get-ADOUserInfo -PAT $ADOpat -orgName $ADOorgName
 foreach ($ADSgroup in $ADSGroupInfo) {
     $groupFound = $false
     foreach ($ADO_group in $ADOGroupInfo) {
-        if ($ADSgroup.Name -eq $ADO_group.Name) {
+        $updatedName = $ADSgroup.Name.Replace("DefaultCollection", $ADOorgName)
+        if ($updatedName -eq $ADO_group.Name) {
             $ADOgroupID = $ADO_group.id
             $groupFound = $true
         }
