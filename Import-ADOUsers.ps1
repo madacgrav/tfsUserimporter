@@ -59,7 +59,8 @@ function Add-ADOUsertoGroup ([string]$userid, [string]$groupID,[string]$PAT, [st
     $header = @{Authorization = ("Basic {0}" -f $Auth) }
     $updateMemberAPI = "https://vssps.dev.azure.com/$orgName/_apis/graph/memberships/" + $userid + "/" + $groupID + "?api-version=7.1-preview.1"
     try {
-        Invoke-RestMethod -Uri $updateMemberAPI -Headers $header -Method PUT -ContentType application/json
+        $respponse = Invoke-RestMethod -Uri $updateMemberAPI -Headers $header -Method PUT -ContentType application/json
+        write-Debug $respponse
         return "success"
    }
    catch {
