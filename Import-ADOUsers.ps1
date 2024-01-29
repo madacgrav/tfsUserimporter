@@ -57,22 +57,21 @@ function Add-ADOUsertoGroup ([string]$userid, [string]$groupID,[string]$PAT, [st
     $Auth = [System.Text.Encoding]::UTF8.GetBytes($Auth)
     $Auth = [System.Convert]::ToBase64String($Auth)
     $header = @{Authorization = ("Basic {0}" -f $Auth) }
-    $updateMemberAPI = "https://vssps.dev.azure.com/$orgName/_apis/graph/memberships/" + $uuserid + "/" + $groupID + "?api-version=7.1-preview.1"
+    $updateMemberAPI = "https://vssps.dev.azure.com/$orgName/_apis/graph/memberships/" + $userid + "/" + $groupID + "?api-version=7.1-preview.1"
     try {
-        $resposne = Invoke-RestMethod -Uri $updateMemberAPI -Headers $header -Method PUT  -ContentType application/json
+        Invoke-RestMethod -Uri $updateMemberAPI -Headers $header -Method PUT -ContentType application/json
         return "success"
-    }
-    catch {
-        return "failed"
-    }
-    
+   }
+   catch {
+      write-host $_.Exception.Message
+      return "failed"
+   }
 }
 
-$identityMap = Import-Csv -Path ".\identityMap.csv" | ConvertFrom-Csv -Delimiter ';'
+$identityMap = Import-Csv -Path ".\identitymap.csv"
 $ADSGroupInfo = Get-Content -Path ".\Export_ADSGroupMemberships.json" | ConvertFrom-Json
 $ADOGroupInfo = Get-ADOGroupInfo -PAT $ADOpat -orgName $ADOorgName
 $ADOUserInfo = Get-ADOUserInfo -PAT $ADOpat -orgName $ADOorgName
-
 
 foreach ($ADSgroup in $ADSGroupInfo) {
     $groupFound = $false
@@ -83,9 +82,10 @@ foreach ($ADSgroup in $ADSGroupInfo) {
         }
     }
     if ($groupFound) {
+        $ADSgroup.Name
         foreach ($member in $ADSGroup.Members) {
+            $identityFound = $false
             foreach ($identity in $identityMap) {
-                $identityFound = $false
                 $fullUser = $domainName + "\" + $member
                 if ($fullUser -eq $identity.UserName) {
                     $emailAddress = $identity.Email
@@ -93,9 +93,9 @@ foreach ($ADSgroup in $ADSGroupInfo) {
                 }
             }
             if ($identityFound) {
+                $ADOuserFound = $false
                 foreach ($ADO_user in $ADOUserInfo) {
-                    $ADOuserFound = $false
-                    if ($emailAddress -eq $ADO_user.principalName) {
+                    if ($emailAddress -eq $ADO_user.Name) {
                         $ADOuserid = $ADO_user.id
                         $ADOuserFound = $true
                     }
@@ -103,22 +103,23 @@ foreach ($ADSgroup in $ADSGroupInfo) {
                 if ($ADOuserFound) {
                     $status = Add-ADOUsertoGroup -userid $ADOuserid -groupID $ADOgroupID -PAT $ADOpat -orgName $ADOorgName
                     if ($status -eq "success") {
-                        write-host ("User added to ADO: " + $member)
+                        write-host ("User added to ADO: " + $member) -ForegroundColor Green
                     }
                     else {
-                        write-host ("User not added to ADO: " + $member)
+
+                        write-host ("User not added to ADO: " + $member) -ForegroundColor Red
                     }
                 }
                 else {
-                    write-host ("User not found in ADO: " + $member)
+                    write-host ("User not found in ADO: " + $member) -ForegroundColor Red
                 }
             }
             else {
-                write-host ("User not found in identityMap: " + $member)
+                write-host ("User not found in identityMap: " + $member) -ForegroundColor Yellow
             }
         }
     }
     else  {
-        write-host ("Group not found in ADO: " + $ADSgroup.Name)
+        write-host ("Group not found in ADO: " + $ADSgroup.Name) -ForegroundColor DarkCyan
     }
 }
